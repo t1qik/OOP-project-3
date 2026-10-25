@@ -1,3 +1,3 @@
-public class XmlAnalyzer {
+public class XmlAnalyzer implements DataAnalyzer {
 
 }
