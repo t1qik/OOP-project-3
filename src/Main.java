@@ -37,7 +37,7 @@ void main() {
             analyzer.analyze(input);
         } catch (IOException e) {
             System.out.println("Ошибка чтения файла: " + e.getMessage());
-            continue; // Если файл не найден, возвращаемся в начало цикла
+            continue;
         }
 
         Map<Address, Integer> duplicates;

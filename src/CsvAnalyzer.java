@@ -13,7 +13,6 @@ public class CsvAnalyzer implements  DataAnalyzer{
     public void analyze(String filePath) throws IOException{
         long startTime = System.currentTimeMillis();
 
-        // Буферизованное чтение для скорости
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
             boolean isFirstLine = true;
@@ -24,14 +23,12 @@ public class CsvAnalyzer implements  DataAnalyzer{
                     continue; // Пропускаем заголовок
                 }
 
-                // Быстрый парсинг без split(";")
                 int pos1 = line.indexOf(';');
                 int pos2 = line.indexOf(';', pos1 + 1);
                 int pos3 = line.indexOf(';', pos2 + 1);
 
                 if (pos1 == -1 || pos2 == -1 || pos3 == -1) continue;
 
-                // Извлекаем данные (убираем кавычки, если они есть)
                 String city = clean(line.substring(0, pos1));
                 String street = clean(line.substring(pos1 + 1, pos2));
                 int house = Integer.parseInt(clean(line.substring(pos2 + 1, pos3)));
@@ -39,10 +36,8 @@ public class CsvAnalyzer implements  DataAnalyzer{
 
                 Address addr = new Address(city, street, house, height);
 
-                // 1. Считаем дубликаты (merge добавляет 1 или инкрементирует текущее)
                 duplicatesMap.merge(addr, 1, Integer::sum);
 
-                // 2. Считаем этажность по городам
                 if (height >= 1 && height <= 5) {
                     int[] floors = cityFloorsMap.computeIfAbsent(city, k -> new int[5]);
                     floors[height - 1]++;

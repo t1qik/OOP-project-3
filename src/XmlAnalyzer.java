@@ -16,9 +16,8 @@ public class XmlAnalyzer implements DataAnalyzer {
     public void analyze(String filePath) throws IOException {
         long startTime = System.currentTimeMillis();
 
-        // Настройка StAX
         XMLInputFactory factory = XMLInputFactory.newInstance();
-        // Отключаем загрузку внешних DTD, чтобы избежать уязвимостей (XXE)
+
         factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
         factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
 
@@ -28,14 +27,11 @@ public class XmlAnalyzer implements DataAnalyzer {
             while (reader.hasNext()) {
                 int event = reader.next();
 
-                // Нас интересуют только открывающие теги <item>
                 if (event == XMLStreamConstants.START_ELEMENT && "item".equals(reader.getLocalName())) {
 
-                    // Читаем атрибуты
                     String city = reader.getAttributeValue(null, "city");
                     String street = reader.getAttributeValue(null, "street");
 
-                    // Атрибуты могут отсутствовать, делаем проверку
                     if (city == null || street == null) continue;
 
                     int house = Integer.parseInt(reader.getAttributeValue(null, "house"));
@@ -43,10 +39,8 @@ public class XmlAnalyzer implements DataAnalyzer {
 
                     Address addr = new Address(city.trim(), street.trim(), house, height);
 
-                    // 1. Считаем дубликаты
                     duplicatesMap.merge(addr, 1, Integer::sum);
 
-                    // 2. Считаем этажность по городам
                     if (height >= 1 && height <= 5) {
                         int[] floors = cityFloorsMap.computeIfAbsent(city, k -> new int[5]);
                         floors[height - 1]++;
